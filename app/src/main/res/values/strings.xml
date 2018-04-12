@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">SetListMaker</string>
     <string name="buttonText">Generate Setlist</string>
+    <string name="final_text">final_text</string>
+    <string name="title1_minutes">Set Lengths (Minutes)</string>
+    <string name="number_of_sets">Number of Sets: </string>
 </resources>

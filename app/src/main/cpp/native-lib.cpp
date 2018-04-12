@@ -4,7 +4,7 @@
 extern "C" JNIEXPORT jstring
 
 JNICALL
-Java_app_band_runawaynation_matth_setlistmaker_MainActivity_stringFromJNI(
+Java_app_band_runawaynation_matth_setlistmaker_MainActivity_myfunc(
         JNIEnv *env,
         jobject /* this */) {
     std::string hello = "Hello from C++";
