@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">SetListMaker</string>
+    <string name="buttonText">Generate Setlist</string>
+</resources>
