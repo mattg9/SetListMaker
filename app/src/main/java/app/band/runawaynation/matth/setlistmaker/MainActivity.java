@@ -72,6 +72,9 @@ public class MainActivity extends AppCompatActivity {
         seekBarSetCount.setProgress(1);
         seekBarSetLength.setProgress(30);
 
+        final Button generateSets = findViewById(R.id.buttonGenerateSets);
+        generateSets.setEnabled(false);
+
         // setup buttons
         EditText playlist = findViewById(R.id.editTextFile);
         final String filename = playlist.getText().toString();
@@ -84,6 +87,7 @@ public class MainActivity extends AppCompatActivity {
                     CSVReader reader = new CSVReader(new FileReader(downloadFolder + filename + ".csv"));
                     songs = (ArrayList<String[]>) reader.readAll();
                     Toast.makeText(MainActivity.this, R.string.successfulRead, Toast.LENGTH_SHORT).show();
+                    generateSets.setEnabled(true);
                 } catch (Exception e) {
                     e.printStackTrace();
                     Toast.makeText(MainActivity.this, R.string.failRead, Toast.LENGTH_SHORT).show();
@@ -91,8 +95,19 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        /* SONG */
+        /*
+            [0] - title
+            [1] - band
+            [2] - time (int)
+            [3] - type of song (slow or upbeat)
+        */
+        // remove is to stop duplicates
+        // stop back to back bands!
 
-        Button generateSets = findViewById(R.id.buttonGenerateSets);
+        // TODO stop 3 slow songs in a row
+        // TODO openers/closers/risers/dropers
+        // TODO specify a set song could go in.
         generateSets.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -100,6 +115,7 @@ public class MainActivity extends AppCompatActivity {
                 // make a copy
                 ArrayList<String[]> songsCopy = new ArrayList<>(songs.size());
                 for (String[] s : songs) { songsCopy.add(s.clone()); }
+                String lastBand = "";
                 // MASTER LOOP
                 int setCount = seekBarSetCount.getProgress();
                 while (setCount > 0) {
@@ -114,11 +130,14 @@ public class MainActivity extends AppCompatActivity {
                         // is there time for it? time = 3rd column
                         int songLength = Integer.parseInt(element[2]);
                         if (setLength > songLength) {
+                            if (element[1].equals(lastBand)) continue; // try again
                             setLength -= songLength;
                             newSet.add(element[0]);
                             songsCopy.remove(element);
+                            lastBand = element[1];
+                        } else {
+                            break; // populate a new set
                         }
-                        songsCopy.remove(element);
                     }
                     sets.add(newSet);
                     setCount--;
@@ -131,6 +150,7 @@ public class MainActivity extends AppCompatActivity {
                     for (int j = 0; j < list.size(); j++) {
                         outputText.append(list.get(j)).append("\n");
                     }
+                    outputText.append("\n");
                 }
                 finalText.setText(outputText.toString());
             }
