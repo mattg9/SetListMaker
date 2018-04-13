@@ -1,7 +1,12 @@
 <resources>
     <string name="app_name">SetListMaker</string>
-    <string name="buttonText">Generate Setlist</string>
+    <string name="button_generateSets">Generate Setlist</string>
     <string name="final_text">final_text</string>
-    <string name="title1_minutes">Set Lengths (Minutes)</string>
-    <string name="number_of_sets">Number of Sets: </string>
+    <string name="titleSetCount">Number of Sets: </string>
+    <string name="defaultFilename">playlist</string>
+    <string name="titleFilename">Playlist Filename: </string>
+    <string name="successfulRead">Playlist loaded into Memory</string>
+    <string name="failRead">The file was not found</string>
+    <string name="button_readCSV">Read CSV</string>
+    <string name="titleSetMinutes">Set Minutes: </string>
 </resources>
