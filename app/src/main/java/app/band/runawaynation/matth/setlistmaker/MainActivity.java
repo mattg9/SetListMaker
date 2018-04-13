@@ -97,39 +97,42 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 sets.clear();
+                // make a copy
+                ArrayList<String[]> songsCopy = new ArrayList<>(songs.size());
+                for (String[] s : songs) { songsCopy.add(s.clone()); }
+                // MASTER LOOP
                 int setCount = seekBarSetCount.getProgress();
                 while (setCount > 0) {
                     int setLength = seekBarSetLength.getProgress();
                     List<String> newSet = new ArrayList<>();
-                    while (setLength > 0 && songs.size() > 1) {
+                    while (setLength > 0 && songsCopy.size() > 1) {
                         // pick random song
                         Random rand = new Random();
                         int n = 1; // ignore headers!
-                        if (songs.size() > 1) n = rand.nextInt(songs.size() - 1) + 1;
-                        String[] element = songs.get(n);
+                        if (songsCopy.size() > 1) n = rand.nextInt(songsCopy.size() - 1) + 1;
+                        String[] element = songsCopy.get(n);
                         // is there time for it? time = 3rd column
-                        Log.d("TAG", element[0] + element[1] + element[2]);
                         int songLength = Integer.parseInt(element[2]);
                         if (setLength > songLength) {
                             setLength -= songLength;
                             newSet.add(element[0]);
-                            songs.remove(element);
+                            songsCopy.remove(element);
                         }
-                        songs.remove(element);
+                        songsCopy.remove(element);
                     }
                     sets.add(newSet);
                     setCount--;
                 }
 
-                String outputText = "";
+                StringBuilder outputText = new StringBuilder();
                 for(int i = 0; i < sets.size(); i++) {
-                    outputText += "SET " + (i + 1) + "\n";
+                    outputText.append("SET ").append(i + 1).append("\n");
                     List list = sets.get(i);
                     for (int j = 0; j < list.size(); j++) {
-                        outputText += list.get(j) + "\n";
+                        outputText.append(list.get(j)).append("\n");
                     }
                 }
-                finalText.setText(outputText);
+                finalText.setText(outputText.toString());
             }
         });
     }
