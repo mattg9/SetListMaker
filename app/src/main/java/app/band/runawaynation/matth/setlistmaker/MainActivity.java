@@ -18,8 +18,9 @@ import java.util.Random;
 public class MainActivity extends AppCompatActivity {
 
     // the data
-    private ArrayList<String[]> songs = new ArrayList<>();
-    private ArrayList<List> sets = new ArrayList<>();
+    private ArrayList<String[]> data = new ArrayList<>();
+    private ArrayList<Songs> songs = new ArrayList<>();
+    private ArrayList<List<String>> sets = new ArrayList<>();
     final private String downloadFolder = "/storage/emulated/0/Download/";
 
     @Override
@@ -27,6 +28,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // text field with output
         final TextView finalText = findViewById(R.id.finalText);
 
         // setup seek bars
@@ -57,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress,
                                           boolean fromUser) {
-                setLengthProgress.setText(String.valueOf(progress));
+                setLengthProgress.setText(String.valueOf(progress*5));
             }
 
             @Override
@@ -83,9 +85,9 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 try {
-                    songs.clear();
+                    data.clear();
                     CSVReader reader = new CSVReader(new FileReader(downloadFolder + filename + ".csv"));
-                    songs = (ArrayList<String[]>) reader.readAll();
+                    data = (ArrayList<String[]>) reader.readAll();
                     Toast.makeText(MainActivity.this, R.string.successfulRead, Toast.LENGTH_SHORT).show();
                     generateSets.setEnabled(true);
                 } catch (Exception e) {
@@ -95,64 +97,69 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        /* SONG */
-        /*
-            [0] - title
-            [1] - band
-            [2] - time (int)
-            [3] - type of song (slow or upbeat)
-        */
-        // remove is to stop duplicates
-        // stop back to back bands!
-
-        // TODO stop 3 slow songs in a row
-        // TODO openers/closers/risers/dropers
-        // TODO specify a set song could go in.
         generateSets.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                sets.clear();
-                // make a copy
-                ArrayList<String[]> songsCopy = new ArrayList<>(songs.size());
-                for (String[] s : songs) { songsCopy.add(s.clone()); }
+                /* INITIALIZATION */
+                sets.clear(); songs.clear();
                 String lastBand = "";
-                // MASTER LOOP
-                int setCount = seekBarSetCount.getProgress();
-                while (setCount > 0) {
-                    int setLength = seekBarSetLength.getProgress();
+                int slowSongCount = 0;
+                // create Songs from given data
+                for (String [] s : data){
+                    songs.add(new Songs(s[0], s[1], s[2], s[3]));
+                }
+                int setCount = Integer.parseInt(setCountProgress.getText().toString());
+                int totalTime = Integer.parseInt(setLengthProgress.getText().toString());
+                /* MAKE SETS */
+                while (setCount > 0 && songs.size() > 1) {
+                    int remainingTime = totalTime;
                     List<String> newSet = new ArrayList<>();
-                    while (setLength > 0 && songsCopy.size() > 1) {
+                    while (remainingTime > 0 && songs.size() > 1) {
                         // pick random song
                         Random rand = new Random();
-                        int n = 1; // ignore headers!
-                        if (songsCopy.size() > 1) n = rand.nextInt(songsCopy.size() - 1) + 1;
-                        String[] element = songsCopy.get(n);
-                        // is there time for it? time = 3rd column
-                        int songLength = Integer.parseInt(element[2]);
-                        if (setLength > songLength) {
-                            if (element[1].equals(lastBand)) continue; // try again
-                            setLength -= songLength;
-                            newSet.add(element[0]);
-                            songsCopy.remove(element);
-                            lastBand = element[1];
+                        int n = rand.nextInt(songs.size() - 1) + 1;
+                        Songs songPicked = songs.get(n);
+                        int songLength = Integer.parseInt(songPicked.getSongLength());
+                        if (remainingTime > songLength) { // basic condition!
+                            // more conditions - not met? throw try again
+                            if (songPicked.getBandName().equals(lastBand)) continue; // no back to back bands
+                            if (newSet.isEmpty() && songPicked.getSongType().equals("Slow")) continue; // don't start slow
+                            if (songPicked.getSongType().equals("Slow") && slowSongCount >= 2) continue; // don't stay slow
+                            // don't pick a slow song if we haven't made it a third of way through set
+                            // don't pick a slow song if we have made it 75 % of the way through set
+                            float progress = (float) (totalTime - remainingTime) / totalTime;
+                            if ((songPicked.getSongType().equals("Slow") && progress < 0.33) ||
+                                    (songPicked.getSongType().equals("Slow") && progress > 0.75)) continue;
+                            // got one? okay let's carry on
+                            remainingTime -= songLength;
+                            newSet.add(songPicked.getSongType() + "\t\t\t\t" + songPicked.getSongTitle());
+                            songs.remove(songPicked);
+                            lastBand = songPicked.getBandName();
+                            if (songPicked.getSongType().equals("Slow")) {
+                                slowSongCount++;
+                            } else {
+                                slowSongCount = 0;
+                            }
                         } else {
                             break; // populate a new set
+                            // you're on your own for encores
                         }
                     }
                     sets.add(newSet);
                     setCount--;
                 }
 
+                /* OUTPUT SETS */
                 StringBuilder outputText = new StringBuilder();
-                for(int i = 0; i < sets.size(); i++) {
-                    outputText.append("SET ").append(i + 1).append("\n");
-                    List list = sets.get(i);
-                    for (int j = 0; j < list.size(); j++) {
-                        outputText.append(list.get(j)).append("\n");
+                for(List<String> set: sets) {
+                    outputText.append("=== SET ===").append("\n");
+                    for (String song : set) {
+                        outputText.append(song).append("\n");
                     }
                     outputText.append("\n");
                 }
                 finalText.setText(outputText.toString());
+                // DONE :)
             }
         });
     }

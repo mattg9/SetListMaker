@@ -3,7 +3,7 @@
     <string name="button_generateSets">Generate Setlist</string>
     <string name="final_text">final_text</string>
     <string name="titleSetCount">Number of Sets: </string>
-    <string name="defaultFilename">playlist</string>
+    <string name="defaultFilename">Playlist</string>
     <string name="titleFilename">Playlist Filename: </string>
     <string name="successfulRead">Playlist loaded into Memory</string>
     <string name="failRead">The file was not found</string>

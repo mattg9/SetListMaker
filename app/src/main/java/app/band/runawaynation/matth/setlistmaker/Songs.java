@@ -9,12 +9,15 @@ public class Songs {
         @CsvBindByName
         private String bandName;
         @CsvBindByName
-        private int songLength;
+        private String songLength;
+        @CsvBindByName
+        private String songType;
 
-        public Songs(String songTitle, String bandName, int songLength) {
+        Songs(String songTitle, String bandName, String songLength, String songType) {
                 this.songTitle = songTitle;
                 this.bandName = bandName;
                 this.songLength = songLength;
+                this.songType = songType;
         }
 
         // Getters!
@@ -24,7 +27,10 @@ public class Songs {
         public String getBandName() {
             return bandName;
         }
-        public int getSongLength() {
+        public String getSongLength() {
             return songLength;
+        }
+        public String getSongType() {
+                return songType;
         }
 }
