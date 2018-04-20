@@ -77,15 +77,15 @@ public class MainActivity extends AppCompatActivity {
         generateSets.setEnabled(false);
 
         // setup buttons
-        EditText playlist = findViewById(R.id.editTextFile);
-        final String filename = playlist.getText().toString();
+        final EditText playlist = findViewById(R.id.editTextFile);
         Button readCSV = findViewById(R.id.buttonFile);
         readCSV.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 try {
-                    data.clear();
+                    String filename = playlist.getText().toString();
                     CSVReader reader = new CSVReader(new FileReader(downloadFolder + filename + ".csv"));
+                    data.clear();
                     data = (ArrayList<String[]>) reader.readAll();
                     Toast.makeText(MainActivity.this, R.string.successfulRead, Toast.LENGTH_SHORT).show();
                     generateSets.setEnabled(true);
