@@ -2,16 +2,16 @@ package app.band.runawaynation.matth.setlistmaker;
 
 import com.opencsv.bean.CsvBindByName;
 
-public class Songs {
+class Songs {
 
         @CsvBindByName
-        private String songTitle;
+        private final String songTitle;
         @CsvBindByName
-        private String bandName;
+        private final String bandName;
         @CsvBindByName
-        private String songLength;
+        private final String songLength;
         @CsvBindByName
-        private String songType;
+        private final String songType;
 
         Songs(String songTitle, String bandName, String songLength, String songType) {
                 this.songTitle = songTitle;

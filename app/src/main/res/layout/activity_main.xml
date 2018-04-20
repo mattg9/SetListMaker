@@ -35,28 +35,38 @@
                     android:layout_marginEnd="8dp"
                     android:layout_marginStart="8dp"
                     android:layout_marginTop="8dp"
-                    android:layout_weight="1"
+                    android:layout_weight="0.2"
                     android:text="@string/titleFilename" />
 
                 <EditText
                     android:id="@+id/editTextFile"
-                    android:layout_width="118dp"
+                    android:layout_width="35dp"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="15dp"
                     android:layout_marginStart="8dp"
                     android:layout_marginTop="8dp"
-                    android:layout_weight="1"
+                    android:layout_weight="0.5"
                     android:accessibilityLiveRegion="polite"
                     android:hint="@string/titleFilename"
                     android:inputType="text"
                     android:text="@string/defaultFilename"
                     app:layout_constraintEnd_toEndOf="parent" />
 
+                <TextView
+                    android:id="@+id/textView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_weight="0.1"
+                    android:text="@string/csv" />
+
                 <Button
                     android:id="@+id/buttonFile"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
+                    android:layout_weight="0.2"
                     android:text="@string/button_readCSV" />
             </LinearLayout>
 

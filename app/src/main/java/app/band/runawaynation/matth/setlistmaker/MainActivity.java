@@ -18,8 +18,8 @@ public class MainActivity extends AppCompatActivity {
 
     // the data
     private ArrayList<String[]> data = new ArrayList<>();
-    private ArrayList<Songs> songs = new ArrayList<>();
-    private ArrayList<List<String>> sets = new ArrayList<>();
+    private final ArrayList<Songs> songs = new ArrayList<>();
+    private final ArrayList<List<String>> sets = new ArrayList<>();
     final private String downloadFolder = "/storage/emulated/0/Download/";
 
     @Override
@@ -70,8 +70,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        seekBarSetCount.setProgress(1);
-        seekBarSetLength.setProgress(30);
+        seekBarSetCount.setProgress(3);
+        seekBarSetLength.setProgress(9);
 
         final Button generateSets = findViewById(R.id.buttonGenerateSets);
         generateSets.setEnabled(false);
@@ -96,15 +96,14 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // TODO - no back to back long songs!
         generateSets.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 /* INITIALIZATION */
-                sets.clear(); songs.clear();
+                sets.clear();
+                songs.clear();
                 String lastBand = "";
-                int slowSongCount = 0, upbeatSongCount = 0;
-
+                int lastSongLength = 0, slowSongCount = 0, upbeatSongCount = 0;
                 // create Songs from given data
                 for (String [] s : data){
                     songs.add(new Songs(s[0], s[1], s[2], s[3]));
@@ -124,9 +123,10 @@ public class MainActivity extends AppCompatActivity {
                         if (remainingTime > songLength) { // basic condition!
                             // no back to back bands
                             if (songPicked.getBandName().equals(lastBand)) continue;
+                            if (songLength >= 5 && lastSongLength >= 5) continue;
                             float progress = (float) (totalTime - remainingTime) / totalTime;
                             // TRY not to start/end/interrupt with slow songs
-                            if (!tooManySlow(songs)) {
+                            if (goodSongRatio(songs)) {
                                 if ((songPicked.getSongType().equals("Slow") && progress < 0.33) ||
                                         (songPicked.getSongType().equals("Slow") && progress > 0.75) ||
                                         (newSet.isEmpty() && songPicked.getSongType().equals("Slow")) ||
@@ -139,6 +139,7 @@ public class MainActivity extends AppCompatActivity {
                             newSet.add(songPicked.getSongType() + "\t\t\t\t" + songPicked.getSongTitle());
                             songs.remove(songPicked);
                             lastBand = songPicked.getBandName();
+                            lastSongLength = songLength;
                             if (songPicked.getSongType().equals("Slow")) {
                                 upbeatSongCount = 0;
                                 slowSongCount++;
@@ -153,15 +154,16 @@ public class MainActivity extends AppCompatActivity {
                     // last set - still lots of time left?
                     if (setCount == 0 && remainingTime > 5)
                         Toast.makeText(MainActivity.this,
-                                "Set time not matched.\nNot Enough Material!" ,
-                                Toast.LENGTH_LONG).show();;
+                                R.string.SetTimeFail ,
+                                Toast.LENGTH_SHORT).show();
                 }
 
                 /* OUTPUT SETS */
                 StringBuilder outputText = new StringBuilder();
                 int outputSet = 1;
                 for(List<String> set: sets) {
-                    outputText.append("=== SET ").append(outputSet).append(" ===").append("\n");
+                    outputText.append("=== SET ").append(outputSet)
+                            .append(" ===").append("\n");
                     for (String song : set) {
                         outputText.append(song).append("\n");
                     }
@@ -170,15 +172,15 @@ public class MainActivity extends AppCompatActivity {
                 }
                 if (outputSet <= Integer.parseInt(setCountProgress.getText().toString()))
                     Toast.makeText(MainActivity.this,
-                            "Set count not matched.\nNot Enough Material!" ,
-                            Toast.LENGTH_LONG).show();
+                            R.string.SetCountFail ,
+                            Toast.LENGTH_SHORT).show();
                 finalText.setText(outputText.toString());
                 // DONE :)
             }
         });
     }
 
-    private boolean tooManySlow(ArrayList<Songs> songs) {
+    private boolean goodSongRatio(ArrayList<Songs> songs) {
         int slow = 0, upbeat = 0;
         for (Songs s : songs) {
             if (s.getSongType().equals("Slow")) {
@@ -187,6 +189,6 @@ public class MainActivity extends AppCompatActivity {
                 upbeat++;
             }
         }
-        return slow >= upbeat;
+        return slow < upbeat;
     }
 }
